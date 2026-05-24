@@ -117,7 +117,7 @@
           isDetonating = false;
           detonateBtn.classList.remove('dooking');
           updateDetonateButton();
-        }, 4000);
+        }, 7000);
         return;
       }
 
@@ -135,13 +135,13 @@
 
   function getDelayForType(typeId) {
     switch (typeId) {
-      case 'tsar': return 2500;      // Tsar is massive, give it room
-      case 'daxi': return 1500;       // Heavy blast
-      case 'carrier': return 2000;    // Fan volley takes time
-      case 'tomahawk': return 1800;   // Chain explosions
-      case 'gatling': return 2500;    // Continuous stream
-      case 'normal': return 1200;     // Quick standard burst
-      default: return 1500;
+      case 'tsar': return 4500;      // Tsar is massive, give it room
+      case 'daxi': return 3000;       // Heavy blast
+      case 'carrier': return 3500;    // Fan volley takes time
+      case 'tomahawk': return 3000;   // Chain explosions
+      case 'gatling': return 4000;    // Continuous stream
+      case 'normal': return 2000;     // Quick standard burst
+      default: return 2500;
     }
   }
 

@@ -215,21 +215,21 @@ function burstTsar(x, y) {
   ];
 
   // Wave 1: Massive primary burst
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 400; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = randomInRange(1, 12);
     const c = randomColor(colors);
     const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
       life: 1,
-      decay: randomInRange(0.005, 0.015),
+      decay: randomInRange(0.003, 0.008),
       size: randomInRange(1.5, 4),
       sizeEnd: 0.5,
       color: c,
       colorEnd: { r: 80, g: 20, b: 5 },
-      gravity: 0.04,
-      drag: 0.975,
+      gravity: 0.03,
+      drag: 0.98,
       trail: true,
-      trailLength: 4,
+      trailLength: 5,
     });
     if (p) particles.push(p);
   }
@@ -239,25 +239,25 @@ function burstTsar(x, y) {
     setTimeout(() => {
       const ox = x + randomInRange(-150, 150);
       const oy = y + randomInRange(-80, 80);
-      for (let i = 0; i < 150; i++) {
+      for (let i = 0; i < 180; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = randomInRange(1, 9);
         const c = randomColor(colors);
         const p = createParticle(ox, oy, Math.cos(angle) * speed, Math.sin(angle) * speed, {
           life: 1,
-          decay: randomInRange(0.006, 0.018),
+          decay: randomInRange(0.004, 0.010),
           size: randomInRange(1.5, 3.5),
           sizeEnd: 0.3,
           color: c,
           colorEnd: { r: 60, g: 10, b: 0 },
-          gravity: 0.05,
-          drag: 0.97,
+          gravity: 0.04,
+          drag: 0.98,
           trail: true,
-          trailLength: 3,
+          trailLength: 4,
         });
         if (p) particles.push(p);
       }
-    }, 200 + w * 180);
+    }, 400 + w * 350);
   }
 
   // Wave 3: Final cascade crackle
@@ -265,37 +265,37 @@ function burstTsar(x, y) {
     setTimeout(() => {
       const ox = x + randomInRange(-200, 200);
       const oy = y + randomInRange(-120, 60);
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 100; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = randomInRange(0.5, 5);
         const p = createParticle(ox, oy, Math.cos(angle) * speed, Math.sin(angle) * speed, {
           life: 1,
-          decay: randomInRange(0.01, 0.025),
-          size: randomInRange(1, 2),
+          decay: randomInRange(0.005, 0.012),
+          size: randomInRange(1, 2.5),
           sizeEnd: 0,
           color: { r: 255, g: 255, b: 220 },
           colorEnd: { r: 255, g: 150, b: 50 },
-          gravity: 0.06,
-          drag: 0.97,
+          gravity: 0.05,
+          drag: 0.98,
           flicker: true,
         });
         if (p) particles.push(p);
       }
-    }, 600 + w * 250);
+    }, 1200 + w * 500);
   }
 
-  screenFlash = 0.4;
+  screenFlash = 0.5;
 }
 
 // 大西炮: Low-altitude heavy cannon blast, shockwave ring
 function burstDaxi(x, y) {
   // Shockwave ring
-  for (let i = 0; i < 120; i++) {
-    const angle = (i / 120) * Math.PI * 2;
+  for (let i = 0; i < 150; i++) {
+    const angle = (i / 150) * Math.PI * 2;
     const speed = randomInRange(6, 10);
     const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
       life: 1,
-      decay: 0.02,
+      decay: randomInRange(0.008, 0.012),
       size: randomInRange(3, 5),
       sizeEnd: 1,
       color: { r: 255, g: 255, b: 255 },
@@ -303,44 +303,44 @@ function burstDaxi(x, y) {
       gravity: 0.01,
       drag: 0.985,
       trail: true,
-      trailLength: 6,
+      trailLength: 8,
     });
     if (p) particles.push(p);
   }
 
   // Heavy falling particles
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 280; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = randomInRange(1, 7);
     const isCore = Math.random() < 0.3;
     const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed - randomInRange(0, 3), {
       life: 1,
-      decay: randomInRange(0.004, 0.01),
+      decay: randomInRange(0.003, 0.006),
       size: isCore ? randomInRange(3, 6) : randomInRange(1.5, 3),
       sizeEnd: isCore ? 2 : 0.5,
       color: isCore ? { r: 255, g: 255, b: 240 } : { r: 255, g: 220, b: 150 },
       colorEnd: isCore ? { r: 200, g: 180, b: 120 } : { r: 120, g: 80, b: 30 },
-      gravity: 0.12, // heavy fall
-      drag: 0.97,
+      gravity: 0.10, // heavy fall
+      drag: 0.98,
       trail: true,
-      trailLength: isCore ? 5 : 3,
+      trailLength: isCore ? 6 : 4,
     });
     if (p) particles.push(p);
   }
 
   // Ground-level ember spray
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 80; i++) {
     const angle = Math.random() * Math.PI; // upward half only
     const speed = randomInRange(2, 8);
     const p = createParticle(x, y, Math.cos(angle) * speed, -Math.abs(Math.sin(angle) * speed), {
       life: 1,
-      decay: randomInRange(0.008, 0.02),
-      size: randomInRange(1, 2),
+      decay: randomInRange(0.005, 0.012),
+      size: randomInRange(1, 2.5),
       sizeEnd: 0,
       color: { r: 255, g: 180, b: 50 },
       colorEnd: { r: 100, g: 30, b: 0 },
-      gravity: 0.15,
-      drag: 0.96,
+      gravity: 0.12,
+      drag: 0.97,
       flicker: true,
     });
     if (p) particles.push(p);
@@ -350,7 +350,7 @@ function burstDaxi(x, y) {
 }
 
 // 航母系列: Fan-shaped volley, multiple rockets
-function burstCarrier(startX, startY) {
+function burstCarrier(startX, startY, canvasW, canvasH) {
   const colors = [
     { r: 0, g: 229, b: 160 },   // green
     { r: 50, g: 255, b: 200 },  // mint
@@ -359,14 +359,13 @@ function burstCarrier(startX, startY) {
     { r: 200, g: 255, b: 220 }, // pale green
   ];
 
-  const canvas = document.getElementById('fireworks-canvas');
-  const w = canvas.width;
-  const h = canvas.height;
+  const visibleW = getVisibleWidth(canvasW);
+  const h = canvasH;
 
   // Launch 7-9 rockets in a fan pattern
   const count = 7 + Math.floor(Math.random() * 3);
-  const spread = w * 0.6;
-  const baseX = w * 0.3;
+  const spread = visibleW * 0.6;
+  const baseX = visibleW * 0.15;
 
   for (let i = 0; i < count; i++) {
     const delay = i * 80; // staggered launch
@@ -382,20 +381,20 @@ function burstCarrier(startX, startY) {
         trailMax: 15,
         onBurst: (bx, by) => {
           // Each rocket bursts into a medium flower
-          for (let j = 0; j < 80; j++) {
+          for (let j = 0; j < 100; j++) {
             const angle = Math.random() * Math.PI * 2;
             const speed = randomInRange(1, 6);
             const p = createParticle(bx, by, Math.cos(angle) * speed, Math.sin(angle) * speed, {
               life: 1,
-              decay: randomInRange(0.008, 0.018),
+              decay: randomInRange(0.004, 0.010),
               size: randomInRange(1.5, 3),
               sizeEnd: 0.5,
               color: c,
               colorEnd: { r: Math.floor(c.r * 0.3), g: Math.floor(c.g * 0.3), b: Math.floor(c.b * 0.3) },
-              gravity: 0.04,
-              drag: 0.975,
+              gravity: 0.03,
+              drag: 0.98,
               trail: true,
-              trailLength: 3,
+              trailLength: 4,
             });
             if (p) particles.push(p);
           }
@@ -407,7 +406,7 @@ function burstCarrier(startX, startY) {
 }
 
 // 战斧系列: High-speed ascent, chain explosions
-function burstTomahawk(startX, startY) {
+function burstTomahawk(startX, startY, canvasW, canvasH) {
   const colors = [
     { r: 255, g: 51, b: 102 },   // hot pink
     { r: 255, g: 100, b: 50 },   // orange-red
@@ -415,8 +414,7 @@ function burstTomahawk(startX, startY) {
     { r: 255, g: 200, b: 100 },  // warm yellow
   ];
 
-  const canvas = document.getElementById('fireworks-canvas');
-  const h = canvas.height;
+  const h = canvasH;
 
   // Launch 5 rockets in rapid succession
   const count = 5;
@@ -437,26 +435,26 @@ function burstTomahawk(startX, startY) {
             setTimeout(() => {
               const ox = bx + randomInRange(-30, 30) * chain;
               const oy = by + randomInRange(-20, 20) * chain;
-              const burstSize = 60 - chain * 10;
+              const burstSize = 80 - chain * 15;
               for (let j = 0; j < burstSize; j++) {
                 const angle = Math.random() * Math.PI * 2;
                 const speed = randomInRange(1, 5 + chain);
                 const c = randomColor(colors);
                 const p = createParticle(ox, oy, Math.cos(angle) * speed, Math.sin(angle) * speed, {
                   life: 1,
-                  decay: randomInRange(0.012, 0.025),
+                  decay: randomInRange(0.006, 0.014),
                   size: randomInRange(1, 2.5),
                   sizeEnd: 0,
                   color: c,
                   colorEnd: { r: 80, g: 10, b: 20 },
-                  gravity: 0.05,
-                  drag: 0.97,
+                  gravity: 0.04,
+                  drag: 0.98,
                   trail: true,
-                  trailLength: 2,
+                  trailLength: 3,
                 });
                 if (p) particles.push(p);
               }
-            }, chain * 100);
+            }, chain * 150);
           }
         },
       });
@@ -466,7 +464,7 @@ function burstTomahawk(startX, startY) {
 }
 
 // 大型加特林: Continuous sweeping stream
-function burstGatling(startX, startY) {
+function burstGatling(startX, startY, canvasW, canvasH) {
   const colors = [
     { r: 255, g: 215, b: 0 },    // gold
     { r: 255, g: 180, b: 0 },    // dark gold
@@ -474,9 +472,8 @@ function burstGatling(startX, startY) {
     { r: 255, g: 255, b: 200 },  // pale yellow
   ];
 
-  const canvas = document.getElementById('fireworks-canvas');
-  const w = canvas.width;
-  const h = canvas.height;
+  const w = getVisibleWidth(canvasW);
+  const h = canvasH;
 
   // Sweeping arc: emit particles in a sweeping pattern over time
   const totalDuration = 3000; // 3 seconds of continuous fire
@@ -507,15 +504,15 @@ function burstGatling(startX, startY) {
         Math.sin(angle) * speed,
         {
           life: 1,
-          decay: randomInRange(0.008, 0.015),
+          decay: randomInRange(0.004, 0.009),
           size: randomInRange(1.5, 3),
           sizeEnd: 0.5,
           color: c,
           colorEnd: { r: 100, g: 60, b: 0 },
-          gravity: 0.07,
+          gravity: 0.06,
           drag: 0.98,
           trail: true,
-          trailLength: 6,
+          trailLength: 7,
         }
       );
       if (p) particles.push(p);
@@ -542,7 +539,7 @@ function burstNormal(x, y) {
   // Symmetrical petals
   for (let i = 0; i < petalCount; i++) {
     const baseAngle = (i / petalCount) * Math.PI * 2;
-    const petalParticles = 12 + Math.floor(Math.random() * 8);
+    const petalParticles = 16 + Math.floor(Math.random() * 10);
 
     for (let j = 0; j < petalParticles; j++) {
       const angle = baseAngle + randomInRange(-0.15, 0.15);
@@ -550,41 +547,48 @@ function burstNormal(x, y) {
       const c = Math.random() < 0.7 ? palette[0] : palette[1];
       const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
         life: 1,
-        decay: randomInRange(0.008, 0.016),
+        decay: randomInRange(0.004, 0.009),
         size: randomInRange(1.5, 3),
         sizeEnd: 0.3,
         color: c,
         colorEnd: { r: Math.floor(c.r * 0.2), g: Math.floor(c.g * 0.2), b: Math.floor(c.b * 0.2) },
-        gravity: 0.04,
-        drag: 0.975,
+        gravity: 0.03,
+        drag: 0.98,
         trail: true,
-        trailLength: 3,
+        trailLength: 4,
       });
       if (p) particles.push(p);
     }
   }
 
   // Center glow
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 40; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = randomInRange(0.5, 2);
     const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
       life: 1,
-      decay: randomInRange(0.02, 0.04),
+      decay: randomInRange(0.012, 0.025),
       size: randomInRange(2, 4),
       sizeEnd: 0,
       color: { r: 255, g: 255, b: 240 },
       colorEnd: palette[0],
       gravity: 0.02,
-      drag: 0.96,
+      drag: 0.97,
     });
     if (p) particles.push(p);
   }
 }
 
+// ---- Visible area helper (exclude right-side panel on desktop) ----
+function getVisibleWidth(canvasW) {
+  const panelWidth = window.innerWidth > 768 ? 380 : 0;
+  return Math.max(canvasW - panelWidth, canvasW * 0.6);
+}
+
 // ---- Launch Functions (rocket + burst) ----
 function launchFirework(typeId, canvasW, canvasH) {
-  const cx = canvasW * randomInRange(0.2, 0.8);
+  const visibleW = getVisibleWidth(canvasW);
+  const cx = visibleW * randomInRange(0.15, 0.85);
   const targetY = canvasH * randomInRange(0.15, 0.4);
 
   switch (typeId) {
@@ -612,15 +616,15 @@ function launchFirework(typeId, canvasW, canvasH) {
       break;
     }
     case 'carrier': {
-      burstCarrier(cx, canvasH);
+      burstCarrier(cx, canvasH, canvasW, canvasH);
       break;
     }
     case 'tomahawk': {
-      burstTomahawk(cx, canvasH);
+      burstTomahawk(cx, canvasH, canvasW, canvasH);
       break;
     }
     case 'gatling': {
-      burstGatling(cx, canvasH);
+      burstGatling(cx, canvasH, canvasW, canvasH);
       break;
     }
     case 'normal': {
