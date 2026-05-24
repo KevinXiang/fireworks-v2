@@ -7,6 +7,7 @@
 
   const PLANE_COUNT = 14;
   const planes = [];
+  const debris = [];
   let canvasW = 0;
   let canvasH = 0;
 
@@ -26,7 +27,7 @@
       bobPhase: Math.random() * Math.PI * 2,
       bobAmp: randomRange(0.1, 0.4),
       bobFreq: randomRange(0.005, 0.015),
-      scale: randomRange(0.5, 1.0),
+      scale: randomRange(1.0, 2.0),
       stunned: false,
       stunTimer: 0,
       trail: [],
@@ -52,8 +53,92 @@
 
   function spawnAll() {
     planes.length = 0;
+    debris.length = 0;
     for (let i = 0; i < PLANE_COUNT; i++) {
       planes.push(createPlane());
+    }
+  }
+
+  // ---- Debris system (plane destruction) ----
+  function createDebris(x, y, color, vx, vy) {
+    const count = 15 + Math.floor(Math.random() * 10);
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = randomRange(1, 6);
+      debris.push({
+        x: x + randomRange(-15, 15),
+        y: y + randomRange(-8, 8),
+        vx: vx + Math.cos(angle) * speed,
+        vy: vy + Math.sin(angle) * speed - randomRange(0, 3),
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.3,
+        life: 1,
+        decay: randomRange(0.005, 0.02),
+        size: randomRange(2, 6),
+        color: i % 3 === 0 ? color.accent : (i % 2 === 0 ? color.body : color.wing),
+        shape: Math.floor(Math.random() * 3), // 0: rect, 1: triangle, 2: ellipse
+        fire: Math.random() < 0.25, // 25% chance of fire particle
+        gravity: randomRange(0.05, 0.15),
+      });
+    }
+  }
+
+  function updateDebris() {
+    for (let i = debris.length - 1; i >= 0; i--) {
+      const d = debris[i];
+      d.x += d.vx;
+      d.y += d.vy;
+      d.vy += d.gravity;
+      d.vx *= 0.99;
+      d.rotation += d.rotSpeed;
+      d.life -= d.decay;
+      if (d.life <= 0) {
+        debris.splice(i, 1);
+      }
+    }
+  }
+
+  function renderDebris(ctx) {
+    for (const d of debris) {
+      ctx.save();
+      ctx.translate(d.x, d.y);
+      ctx.rotate(d.rotation);
+      ctx.globalAlpha = d.life;
+
+      const c = d.fire ? { r: 255, g: 150 + Math.random() * 100, b: 20 } : d.color;
+      const fillColor = d.fire
+        ? `rgb(${c.r},${c.g},${c.b})`
+        : `rgb(${c.r},${c.g},${c.b})`;
+      ctx.fillStyle = fillColor;
+
+      switch (d.shape) {
+        case 0: // rectangle (wing piece)
+          ctx.fillRect(-d.size * 0.6, -d.size * 0.2, d.size * 1.2, d.size * 0.4);
+          break;
+        case 1: // triangle (nose/tail piece)
+          ctx.beginPath();
+          ctx.moveTo(d.size * 0.5, 0);
+          ctx.lineTo(-d.size * 0.5, -d.size * 0.4);
+          ctx.lineTo(-d.size * 0.5, d.size * 0.4);
+          ctx.closePath();
+          ctx.fill();
+          break;
+        default: // ellipse (fuselage piece)
+          ctx.beginPath();
+          ctx.ellipse(0, 0, d.size * 0.5, d.size * 0.25, 0, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+      }
+
+      // Fire glow
+      if (d.fire) {
+        ctx.beginPath();
+        ctx.arc(0, 0, d.size * 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 150, 30, ${d.life * 0.4})`;
+        ctx.fill();
+      }
+
+      ctx.restore();
     }
   }
 
@@ -106,16 +191,30 @@
       // Keep in bounds vertically
       p.y = Math.max(20, Math.min(canvasH * 0.6, p.y));
     }
+
+    updateDebris();
   }
 
   // ---- Blast effect ---
-  function applyBlast(bx, by, radius, force) {
-    for (const p of planes) {
+  function applyBlast(bx, by, radius, force, destroy) {
+    for (let i = planes.length - 1; i >= 0; i--) {
+      const p = planes[i];
       const dx = p.x - bx;
       const dy = p.y - by;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < radius) {
+        // Nuclear destruction: planes in inner 60% radius get destroyed
+        if (destroy && dist < radius * 0.6) {
+          createDebris(p.x, p.y, p.color, p.vx || 0, p.vy || 0);
+          // Spawn replacement plane
+          const newPlane = createPlane();
+          newPlane.x = Math.random() > 0.5 ? -80 : canvasW + 80;
+          planes.splice(i, 1);
+          planes.push(newPlane);
+          continue;
+        }
+
         // Closer = stronger push
         const power = (1 - dist / radius) * force;
         const angle = Math.atan2(dy, dx);
@@ -130,13 +229,17 @@
         p.stunTimer = randomRange(1.5, 3.5);
 
         // Engine trail burst
-        for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
           p.trail.push({
             x: p.x + randomRange(-5, 5),
             y: p.y + randomRange(-3, 3),
           });
         }
       }
+    }
+    // Maintain plane count
+    while (planes.length < PLANE_COUNT) {
+      planes.push(createPlane());
     }
   }
 
@@ -227,6 +330,7 @@
     for (const p of planes) {
       drawPlane(ctx, p);
     }
+    renderDebris(ctx);
   }
 
   function resize(w, h) {

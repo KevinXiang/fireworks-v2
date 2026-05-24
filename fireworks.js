@@ -239,7 +239,8 @@ function applyAirplaneBlast(x, y, typeId) {
   if (!window.AirplaneSystem) return;
   const type = FIREWORK_TYPES[typeId];
   if (type && type.blastRadius) {
-    window.AirplaneSystem.applyBlast(x, y, type.blastRadius, type.blastForce);
+    const destroy = (typeId === 'atomic' || typeId === 'hydrogen');
+    window.AirplaneSystem.applyBlast(x, y, type.blastRadius, type.blastForce, destroy);
   }
 }
 
