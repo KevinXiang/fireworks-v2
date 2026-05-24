@@ -1,0 +1,561 @@
+/* ============================================
+   FIREWORKS COMMAND CENTER — Design System
+   ============================================ */
+
+:root {
+  /* --- Color Tokens --- */
+  --c-bg-deep: #06080f;
+  --c-bg-panel: #0b0f1a;
+  --c-bg-card: #0f1525;
+  --c-bg-card-hover: #141d33;
+  --c-bg-card-selected: #1a2540;
+
+  --c-border: #1a2540;
+  --c-border-selected: #2e4a7a;
+  --c-border-glow: rgba(58, 134, 255, 0.3);
+
+  --c-text-primary: #e8ecf4;
+  --c-text-secondary: #7a8ba8;
+  --c-text-muted: #4a5568;
+  --c-text-accent: #3a86ff;
+
+  /* Firework type accent colors */
+  --c-tsar: #ff6b35;
+  --c-daxi: #f5f5dc;
+  --c-carrier: #00e5a0;
+  --c-tomahawk: #ff3366;
+  --c-gatling: #ffd700;
+  --c-normal: #a78bfa;
+
+  /* --- Spacing Scale (4px base) --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* --- Typography --- */
+  --font-display: 'Orbitron', monospace;
+  --font-body: 'Noto Sans SC', sans-serif;
+
+  --fs-xs: 0.625rem;    /* 10px */
+  --fs-sm: 0.75rem;     /* 12px */
+  --fs-base: 0.875rem;  /* 14px */
+  --fs-md: 1rem;        /* 16px */
+  --fs-lg: 1.25rem;     /* 20px */
+  --fs-xl: 1.5rem;      /* 24px */
+  --fs-2xl: 2rem;       /* 32px */
+
+  /* --- Radii --- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* --- Shadows --- */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-card-selected: 0 0 20px rgba(58, 134, 255, 0.15), 0 2px 12px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 4px 16px rgba(255, 107, 53, 0.3);
+
+  /* --- Transitions --- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--c-bg-deep);
+  color: var(--c-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   CANVAS
+   ============================================ */
+#fireworks-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: var(--c-bg-deep);
+}
+
+/* ============================================
+   SCANLINE OVERLAY (CRT effect)
+   ============================================ */
+.scanline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+}
+
+/* ============================================
+   HUD BAR
+   ============================================ */
+.hud-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-4);
+  background: linear-gradient(180deg, rgba(6, 8, 15, 0.95) 0%, rgba(6, 8, 15, 0.7) 100%);
+  border-bottom: 1px solid var(--c-border);
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hud-bar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.hud-bar__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00e5a0;
+  box-shadow: 0 0 6px #00e5a0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hud-bar__title {
+  color: var(--c-text-primary);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+.hud-bar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-text-secondary);
+}
+
+.hud-bar__value {
+  color: var(--c-text-accent);
+  font-weight: 700;
+  min-width: 32px;
+  text-align: right;
+}
+
+.hud-bar__divider {
+  color: var(--c-text-muted);
+  margin: 0 var(--sp-1);
+}
+
+/* ============================================
+   SELECTION PANEL
+   ============================================ */
+.selection-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 20;
+  width: 380px;
+  height: 100%;
+  background: var(--c-bg-panel);
+  border-left: 1px solid var(--c-border);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(0);
+  transition: transform var(--duration-slow) var(--ease-out);
+  overflow: hidden;
+}
+
+.selection-panel.collapsed {
+  transform: translateX(100%);
+}
+
+.selection-panel__header {
+  padding: var(--sp-10) var(--sp-6) var(--sp-4);
+  border-bottom: 1px solid var(--c-border);
+  margin-top: 36px; /* offset for HUD bar */
+}
+
+.selection-panel__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: var(--c-text-primary);
+  margin-bottom: var(--sp-1);
+}
+
+.selection-panel__subtitle {
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.2em;
+  color: var(--c-text-muted);
+  text-transform: uppercase;
+}
+
+/* ============================================
+   CARD GRID
+   ============================================ */
+.card-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border) transparent;
+}
+
+.card-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.card-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.card-grid::-webkit-scrollbar-thumb {
+  background: var(--c-border);
+  border-radius: 2px;
+}
+
+/* ============================================
+   FIREWORK CARD
+   ============================================ */
+.firework-card {
+  position: relative;
+  background: var(--c-bg-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.firework-card:hover {
+  background: var(--c-bg-card-hover);
+  border-color: var(--c-border-selected);
+}
+
+.firework-card.selected {
+  background: var(--c-bg-card-selected);
+  border-color: var(--c-border-selected);
+  box-shadow: var(--shadow-card-selected);
+}
+
+.firework-card__top {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.firework-card__rank {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 900;
+  line-height: 1;
+  min-width: 36px;
+  text-align: center;
+  opacity: 0.15;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.firework-card.selected .firework-card__rank {
+  opacity: 0.6;
+}
+
+.firework-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.firework-card__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--c-text-primary);
+  margin-bottom: 2px;
+}
+
+.firework-card__badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--c-text-secondary);
+}
+
+.firework-card__toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--c-border);
+  border: none;
+  cursor: pointer;
+  transition: background var(--duration-base) var(--ease-out);
+  flex-shrink: 0;
+}
+
+.firework-card.selected .firework-card__toggle {
+  background: var(--toggle-color, var(--c-text-accent));
+}
+
+.firework-card__toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--c-text-primary);
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.firework-card.selected .firework-card__toggle::after {
+  transform: translateX(18px);
+}
+
+.firework-card__desc {
+  font-size: var(--fs-sm);
+  color: var(--c-text-secondary);
+  line-height: 1.5;
+  margin-top: var(--sp-2);
+}
+
+/* Accent color bar on left side */
+.firework-card::before {
+  content: '';
+  position: absolute;
+  top: var(--sp-4);
+  left: 0;
+  width: 3px;
+  height: calc(100% - var(--sp-8));
+  background: var(--card-accent, var(--c-text-accent));
+  border-radius: 0 2px 2px 0;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.firework-card.selected::before {
+  opacity: 1;
+}
+
+/* ============================================
+   DETONATE BUTTON
+   ============================================ */
+.selection-panel__footer {
+  padding: var(--sp-4) var(--sp-6) var(--sp-6);
+  border-top: 1px solid var(--c-border);
+}
+
+.detonate-btn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--sp-4) var(--sp-6);
+  background: linear-gradient(135deg, #ff6b35 0%, #e8451a 100%);
+  border: 1px solid rgba(255, 107, 53, 0.4);
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-display);
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.detonate-btn:disabled {
+  background: var(--c-bg-card);
+  border-color: var(--c-border);
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.detonate-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-btn);
+  border-color: rgba(255, 107, 53, 0.7);
+}
+
+.detonate-btn:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.detonate-btn__icon {
+  font-size: var(--fs-lg);
+  line-height: 1;
+}
+
+.detonate-btn__text {
+  font-size: var(--fs-xl);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.detonate-btn__sub {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.3em;
+  opacity: 0.7;
+}
+
+/* Active detonation state */
+.detonate-btn.dooking {
+  animation: btn-pulse 0.6s ease-in-out infinite;
+}
+
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 53, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(255, 107, 53, 0.6); }
+}
+
+.selection-panel__info {
+  text-align: center;
+  margin-top: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   PANEL TOGGLE (mobile)
+   ============================================ */
+.panel-toggle {
+  position: fixed;
+  top: 44px;
+  right: var(--sp-4);
+  z-index: 25;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--c-bg-card);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-primary);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+.panel-toggle:hover {
+  background: var(--c-bg-card-hover);
+  border-color: var(--c-border-selected);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .selection-panel {
+    width: 100%;
+    height: 70vh;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    border-left: none;
+    border-top: 1px solid var(--c-border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    transform: translateY(0);
+  }
+
+  .selection-panel.collapsed {
+    transform: translateY(100%);
+  }
+
+  .selection-panel__header {
+    margin-top: var(--sp-2);
+    padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  }
+
+  .selection-panel__footer {
+    padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  }
+
+  .card-grid {
+    padding: var(--sp-3);
+  }
+
+  .panel-toggle {
+    display: flex;
+  }
+
+  .hud-bar__title {
+    font-size: var(--fs-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .firework-card__desc {
+    font-size: var(--fs-xs);
+  }
+
+  .firework-card__name {
+    font-size: var(--fs-sm);
+  }
+
+  .firework-card__rank {
+    font-size: var(--fs-lg);
+    min-width: 28px;
+  }
+}

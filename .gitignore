@@ -1,0 +1,11 @@
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Temporary files
+*.png
+*.md
+server.js
+snapshot-*.md
+
+# Omo directory
+.omo/

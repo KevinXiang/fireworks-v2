@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>烟花指挥中心 — Fireworks Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Full-screen canvas for particle rendering -->
+  <canvas id="fireworks-canvas"></canvas>
+
+  <!-- Scanline overlay for CRT effect -->
+  <div class="scanline-overlay" aria-hidden="true"></div>
+
+  <!-- Top HUD bar -->
+  <header class="hud-bar">
+    <div class="hud-bar__left">
+      <span class="hud-bar__status-dot"></span>
+      <span class="hud-bar__title">烟花指挥中心</span>
+    </div>
+    <div class="hud-bar__right">
+      <span class="hud-bar__label">粒子数</span>
+      <span class="hud-bar__value" id="particle-count">0</span>
+      <span class="hud-bar__divider">|</span>
+      <span class="hud-bar__label">FPS</span>
+      <span class="hud-bar__value" id="fps-display">60</span>
+    </div>
+  </header>
+
+  <!-- Selection panel -->
+  <aside class="selection-panel" id="selection-panel">
+    <div class="selection-panel__header">
+      <h2 class="selection-panel__title">弹药选择</h2>
+      <span class="selection-panel__subtitle">AMMUNITION SELECT</span>
+    </div>
+
+    <div class="card-grid" id="card-grid">
+      <!-- Cards injected by app.js -->
+    </div>
+
+    <div class="selection-panel__footer">
+      <button class="detonate-btn" id="detonate-btn" disabled>
+        <span class="detonate-btn__icon">⚡</span>
+        <span class="detonate-btn__text">引爆</span>
+        <span class="detonate-btn__sub">DETONATE</span>
+      </button>
+      <div class="selection-panel__info">
+        已选择 <span id="selected-count">0</span> / 6 种弹药
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toggle panel button (mobile) -->
+  <button class="panel-toggle" id="panel-toggle" aria-label="切换选择面板">
+    <span class="panel-toggle__icon">☰</span>
+  </button>
+
+  <script src="fireworks.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
