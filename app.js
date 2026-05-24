@@ -62,8 +62,6 @@
 
   // ---- Selection Logic ----
   function toggleSelection(typeId) {
-    if (isDetonating) return;
-
     if (selected.has(typeId)) {
       selected.delete(typeId);
     } else {
@@ -112,12 +110,12 @@
 
     function launchNext() {
       if (launchIndex >= sequence.length) {
-        // All launched, wait for particles to finish then re-enable
+        // Re-enable button quickly for overlapping fireworks
         setTimeout(() => {
           isDetonating = false;
           detonateBtn.classList.remove('dooking');
-          updateDetonateButton();
-        }, 1000);
+          detonateBtn.disabled = false;
+        }, 300);
         return;
       }
 
@@ -125,24 +123,11 @@
       engine.launchFirework(typeId, w, h);
       launchIndex++;
 
-      // Stagger launches
-      const delay = getDelayForType(typeId);
-      setTimeout(launchNext, delay);
+      // Short stagger between selected types
+      setTimeout(launchNext, 300);
     }
 
     launchNext();
-  }
-
-  function getDelayForType(typeId) {
-    switch (typeId) {
-      case 'tsar': return 4500;      // Tsar is massive, give it room
-      case 'daxi': return 3000;       // Heavy blast
-      case 'carrier': return 3500;    // Fan volley takes time
-      case 'tomahawk': return 3000;   // Chain explosions
-      case 'gatling': return 4000;    // Continuous stream
-      case 'normal': return 2000;     // Quick standard burst
-      default: return 2500;
-    }
   }
 
   // ---- Panel Toggle (mobile) ----
