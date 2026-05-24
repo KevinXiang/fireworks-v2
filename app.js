@@ -117,7 +117,7 @@
           isDetonating = false;
           detonateBtn.classList.remove('dooking');
           updateDetonateButton();
-        }, 7000);
+        }, 1000);
         return;
       }
 
