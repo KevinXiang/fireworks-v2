@@ -48,6 +48,14 @@
         <span class="detonate-btn__text">引爆</span>
         <span class="detonate-btn__sub">DETONATE</span>
       </button>
+      <div class="interval-control">
+        <div class="interval-control__header">
+          <span class="interval-control__label">发射间隔</span>
+          <span class="interval-control__value" id="interval-value">3.0s</span>
+        </div>
+        <input type="range" class="interval-control__slider" id="interval-slider"
+               min="500" max="5000" value="3000" step="100">
+      </div>
       <div class="selection-panel__info">
          已选择 <span id="selected-count">0</span> / 8 种弹药
       </div>

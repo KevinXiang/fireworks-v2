@@ -18,6 +18,8 @@
   const selectedCountEl = document.getElementById('selected-count');
   const panelToggle = document.getElementById('panel-toggle');
   const selectionPanel = document.getElementById('selection-panel');
+  const intervalSlider = document.getElementById('interval-slider');
+  const intervalValue = document.getElementById('interval-value');
 
   // ---- Build Cards ----
   const typeOrder = ['atomic', 'hydrogen', 'tsar', 'daxi', 'carrier', 'tomahawk', 'gatling', 'normal'];
@@ -124,8 +126,9 @@
       engine.launchFirework(typeId, w, h);
       launchIndex++;
 
-      // Stagger between selected types
-      setTimeout(launchNext, 3000);
+      // Use slider value for interval
+      const interval = parseInt(intervalSlider.value) || 3000;
+      setTimeout(launchNext, interval);
     }
 
     launchNext();
@@ -134,6 +137,12 @@
   // ---- Panel Toggle (mobile) ----
   panelToggle.addEventListener('click', () => {
     selectionPanel.classList.toggle('collapsed');
+  });
+
+  // ---- Interval slider ----
+  intervalSlider.addEventListener('input', () => {
+    const val = parseInt(intervalSlider.value);
+    intervalValue.textContent = (val / 1000).toFixed(1) + 's';
   });
 
   // ---- Canvas Resize ----
