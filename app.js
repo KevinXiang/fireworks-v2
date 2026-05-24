@@ -124,8 +124,8 @@
       engine.launchFirework(typeId, w, h);
       launchIndex++;
 
-      // Short stagger between selected types
-      setTimeout(launchNext, 300);
+      // Stagger between selected types
+      setTimeout(launchNext, 3000);
     }
 
     launchNext();

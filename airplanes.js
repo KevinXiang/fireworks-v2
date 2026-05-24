@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const PLANE_COUNT = 7;
+  const PLANE_COUNT = 14;
   const planes = [];
   let canvasW = 0;
   let canvasH = 0;
