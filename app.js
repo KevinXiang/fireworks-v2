@@ -20,7 +20,7 @@
   const selectionPanel = document.getElementById('selection-panel');
 
   // ---- Build Cards ----
-  const typeOrder = ['tsar', 'daxi', 'carrier', 'tomahawk', 'gatling', 'normal'];
+  const typeOrder = ['atomic', 'hydrogen', 'tsar', 'daxi', 'carrier', 'tomahawk', 'gatling', 'normal'];
 
   typeOrder.forEach((key) => {
     const type = TYPES[key];
@@ -162,9 +162,9 @@
       e.preventDefault();
       detonate();
     }
-    // Number keys 1-6 to toggle selection
+    // Number keys 1-8 to toggle selection
     const numKey = parseInt(e.key);
-    if (numKey >= 1 && numKey <= 6 && !isDetonating) {
+    if (numKey >= 1 && numKey <= 8 && !isDetonating) {
       const typeId = typeOrder[numKey - 1];
       toggleSelection(typeId);
     }

@@ -75,6 +75,22 @@ function randomColor(colors) {
 
 // ---- Firework Type Definitions ----
 const FIREWORK_TYPES = {
+  atomic: {
+    id: 'atomic',
+    name: '原子弹',
+    badge: 'TIER-SSX · 核子',
+    desc: '蘑菇云升腾——炽白火柱冲天，冲击波环横扫，核火球翻涌。余晖辐射持久不散。',
+    accent: '#ff4500',
+    rank: 0,
+  },
+  hydrogen: {
+    id: 'hydrogen',
+    name: '氢弹',
+    badge: 'TIER-SSX · 热核',
+    desc: '双闪热核——超高空炽白火球膨胀，多重冲击波涟漪。蓝紫辐射纹，大气扭曲效果。',
+    accent: '#7b2fff',
+    rank: 0,
+  },
   tsar: {
     id: 'tsar',
     name: '沙皇5000/沙皇9000',
@@ -581,6 +597,283 @@ function burstNormal(x, y) {
   }
 }
 
+// ---- 原子弹: Mushroom cloud ----
+function burstAtomic(x, y) {
+  screenFlash = 1.0; // 最强白闪
+
+  // 阶段1: 大火球 (0~2s)
+  for (let i = 0; i < 600; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = randomInRange(1, 8);
+    const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
+      life: 1,
+      decay: randomInRange(0.003, 0.006),
+      size: randomInRange(2, 6),
+      sizeEnd: 0.3,
+      color: { r: 255, g: 255, b: 240 },
+      colorEnd: { r: 255, g: 80, b: 10 },
+      gravity: randomInRange(0.02, 0.05),
+      drag: 0.985,
+      trail: true,
+      trailLength: 4,
+    });
+    if (p) particles.push(p);
+  }
+
+  // 阶段2: 蘑菇云烟柱 (0.5~3s)
+  for (let w = 0; w < 3; w++) {
+    setTimeout(() => {
+      const stemX = x + randomInRange(-15, 15);
+      for (let i = 0; i < 200; i++) {
+        const p = createParticle(
+          stemX + randomInRange(-10, 10),
+          y + randomInRange(0, 20),
+          randomInRange(-0.5, 0.5),
+          -(randomInRange(1, 4)),
+          {
+            life: 1,
+            decay: randomInRange(0.002, 0.005),
+            size: randomInRange(2, 5),
+            sizeEnd: 1,
+            color: { r: 80, g: 40, b: 20 },
+            colorEnd: { r: 40, g: 20, b: 10 },
+            gravity: -0.02,
+            drag: 0.99,
+            trail: true,
+            trailLength: 6,
+          }
+        );
+        if (p) particles.push(p);
+      }
+    }, 500 + w * 800);
+  }
+
+  // 阶段3: 蘑菇冠翻滚 (1~4s)
+  for (let w = 0; w < 4; w++) {
+    setTimeout(() => {
+      const capY = y - randomInRange(40, 120);
+      for (let i = 0; i < 200; i++) {
+        const angle = Math.random() * Math.PI;
+        const speed = randomInRange(1, 5);
+        const p = createParticle(
+          x + randomInRange(-30, 30),
+          capY + randomInRange(-10, 10),
+          Math.cos(angle) * speed * randomInRange(0.5, 1.5),
+          -(Math.abs(Math.sin(angle) * speed * 0.5)),
+          {
+            life: 1,
+            decay: randomInRange(0.002, 0.005),
+            size: randomInRange(3, 7),
+            sizeEnd: 0.5,
+            color: { r: 120, g: 60, b: 30 },
+            colorEnd: { r: 60, g: 30, b: 15 },
+            gravity: 0.01,
+            drag: 0.985,
+            trail: true,
+            trailLength: 5,
+            flicker: true,
+          }
+        );
+        if (p) particles.push(p);
+      }
+    }, 1000 + w * 600);
+  }
+
+  // 阶段4: 冲击波环
+  for (let ring = 0; ring < 3; ring++) {
+    setTimeout(() => {
+      for (let i = 0; i < 150; i++) {
+        const angle = (i / 150) * Math.PI * 2;
+        const speed = 3 + ring * 2;
+        const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
+          life: 1,
+          decay: randomInRange(0.006, 0.012),
+          size: randomInRange(2, 4),
+          sizeEnd: 0.5,
+          color: { r: 255, g: 200, b: 120 },
+          colorEnd: { r: 150, g: 80, b: 20 },
+          gravity: 0.03,
+          drag: 0.98,
+          trail: true,
+          trailLength: 4,
+        });
+        if (p) particles.push(p);
+      }
+      // 地面反射
+      for (let i = 0; i < 60; i++) {
+        const angle = Math.random() * Math.PI;
+        const p = createParticle(x, y, Math.cos(angle) * randomInRange(2, 6), -Math.abs(randomInRange(-1, 1)), {
+          life: 1,
+          decay: randomInRange(0.008, 0.015),
+          size: randomInRange(1, 3),
+          sizeEnd: 0,
+          color: { r: 255, g: 150, b: 50 },
+          colorEnd: { r: 80, g: 20, b: 0 },
+          gravity: 0.08,
+          drag: 0.97,
+          flicker: true,
+        });
+        if (p) particles.push(p);
+      }
+    }, 800 + ring * 700);
+  }
+
+  // 阶段5: 余辉烟尘 (3~6s)
+  for (let w = 0; w < 3; w++) {
+    setTimeout(() => {
+      for (let i = 0; i < 100; i++) {
+        const p = createParticle(
+          x + randomInRange(-60, 60),
+          y + randomInRange(-40, 40),
+          randomInRange(-0.3, 0.3),
+          randomInRange(-0.2, 0.5),
+          {
+            life: 1,
+            decay: randomInRange(0.0015, 0.003),
+            size: randomInRange(2, 5),
+            sizeEnd: 1,
+            color: { r: 60, g: 20, b: 10 },
+            colorEnd: { r: 30, g: 10, b: 5 },
+            gravity: 0.005,
+            drag: 0.99,
+            trail: true,
+            trailLength: 8,
+            flicker: true,
+          }
+        );
+        if (p) particles.push(p);
+      }
+    }, 2500 + w * 800);
+  }
+}
+
+// ---- 氢弹: Thermonuclear ----
+function burstHydrogen(x, y) {
+  // 双闪
+  screenFlash = 1.0;
+  setTimeout(() => { screenFlash = 0.8; }, 200);
+
+  // 阶段1: 巨型火球 (0~2s)
+  for (let i = 0; i < 800; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = randomInRange(1, 10);
+    const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
+      life: 1,
+      decay: randomInRange(0.002, 0.005),
+      size: randomInRange(2, 7),
+      sizeEnd: 0.3,
+      color: { r: 255, g: 255, b: 255 },
+      colorEnd: { r: 120, g: 80, b: 255 },
+      gravity: randomInRange(0.01, 0.04),
+      drag: 0.985,
+      trail: true,
+      trailLength: 5,
+    });
+    if (p) particles.push(p);
+  }
+
+  // 阶段2: 多重冲击波 (0.5~4s)
+  for (let ring = 0; ring < 4; ring++) {
+    setTimeout(() => {
+      for (let i = 0; i < 200; i++) {
+        const angle = (i / 200) * Math.PI * 2;
+        const speed = 4 + ring * 3;
+        const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
+          life: 1,
+          decay: randomInRange(0.004, 0.008),
+          size: randomInRange(2, 5),
+          sizeEnd: 0.5,
+          color: { r: 200, g: 200, b: 255 },
+          colorEnd: { r: 80, g: 40, b: 150 },
+          gravity: 0.02,
+          drag: 0.98,
+          trail: true,
+          trailLength: 5,
+        });
+        if (p) particles.push(p);
+      }
+    }, 500 + ring * 700);
+  }
+
+  // 阶段3: 辐射纹 (1~3s)
+  for (let w = 0; w < 3; w++) {
+    setTimeout(() => {
+      for (let i = 0; i < 150; i++) {
+        const baseAngle = (i / 16) * Math.PI * 2;
+        const angle = baseAngle + randomInRange(-0.06, 0.06);
+        const speed = randomInRange(3, 9);
+        const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
+          life: 1,
+          decay: randomInRange(0.004, 0.008),
+          size: randomInRange(1, 3),
+          sizeEnd: 0,
+          color: { r: 180, g: 140, b: 255 },
+          colorEnd: { r: 50, g: 20, b: 80 },
+          gravity: 0.02,
+          drag: 0.985,
+          trail: true,
+          trailLength: 4,
+        });
+        if (p) particles.push(p);
+      }
+    }, 800 + w * 600);
+  }
+
+  // 阶段4: 大气扭曲 (2~5s) - 闪烁蓝紫微粒
+  for (let w = 0; w < 5; w++) {
+    setTimeout(() => {
+      for (let i = 0; i < 80; i++) {
+        const p = createParticle(
+          x + randomInRange(-50, 50),
+          y + randomInRange(-30, 30),
+          randomInRange(-0.5, 0.5),
+          randomInRange(-0.5, 0.5),
+          {
+            life: 1,
+            decay: randomInRange(0.003, 0.007),
+            size: randomInRange(1, 2.5),
+            sizeEnd: 0,
+            color: { r: 150, g: 200, b: 255 },
+            colorEnd: { r: 80, g: 60, b: 200 },
+            gravity: 0.005,
+            drag: 0.99,
+            flicker: true,
+          }
+        );
+        if (p) particles.push(p);
+      }
+    }, 2000 + w * 500);
+  }
+
+  // 阶段5: 持久光斑余辉 (3~6s)
+  for (let w = 0; w < 3; w++) {
+    setTimeout(() => {
+      for (let i = 0; i < 120; i++) {
+        const p = createParticle(
+          x + randomInRange(-40, 40),
+          y + randomInRange(-30, 30),
+          randomInRange(-0.2, 0.2),
+          randomInRange(-0.3, 0.1),
+          {
+            life: 1,
+            decay: randomInRange(0.001, 0.003),
+            size: randomInRange(2, 6),
+            sizeEnd: 0.5,
+            color: { r: 255, g: 255, b: 250 },
+            colorEnd: { r: 100, g: 60, b: 200 },
+            gravity: 0.003,
+            drag: 0.99,
+            trail: true,
+            trailLength: 6,
+            flicker: true,
+          }
+        );
+        if (p) particles.push(p);
+      }
+    }, 3000 + w * 800);
+  }
+}
+
 // ---- Visible area helper (exclude right-side panel on desktop) ----
 function getVisibleWidth(canvasW) {
   const panelWidth = window.innerWidth > 768 ? 380 : 0;
@@ -594,6 +887,32 @@ function launchFirework(typeId, canvasW, canvasH) {
   const targetY = canvasH * randomInRange(0.2, 0.35);
 
   switch (typeId) {
+    case 'atomic': {
+      // Atomic: mushroom cloud, medium altitude
+      const midY = canvasH * randomInRange(0.3, 0.45);
+      const r = createRocket(cx, midY, {
+        startY: canvasH,
+        vy: -(randomInRange(6, 9)),
+        color: { r: 255, g: 120, b: 30 },
+        trailMax: 12,
+        onBurst: (bx, by) => burstAtomic(bx, by),
+      });
+      rockets.push(r);
+      break;
+    }
+    case 'hydrogen': {
+      // Hydrogen: thermonuclear, high altitude
+      const highY = canvasH * randomInRange(0.12, 0.22);
+      const r = createRocket(cx, highY, {
+        startY: canvasH,
+        vy: -(randomInRange(8, 11)),
+        color: { r: 180, g: 140, b: 255 },
+        trailMax: 14,
+        onBurst: (bx, by) => burstHydrogen(bx, by),
+      });
+      rockets.push(r);
+      break;
+    }
     case 'tsar': {
       // Tsar launches a single rocket that triggers massive multi-wave burst
       const r = createRocket(cx, targetY, {
