@@ -82,6 +82,8 @@ const FIREWORK_TYPES = {
     desc: '蘑菇云升腾——炽白火柱冲天，冲击波环横扫，核火球翻涌。余晖辐射持久不散。',
     accent: '#ff4500',
     rank: 0,
+    blastRadius: 450,
+    blastForce: 30,
   },
   hydrogen: {
     id: 'hydrogen',
@@ -90,6 +92,8 @@ const FIREWORK_TYPES = {
     desc: '双闪热核——超高空炽白火球膨胀，多重冲击波涟漪。蓝紫辐射纹，大气扭曲效果。',
     accent: '#7b2fff',
     rank: 0,
+    blastRadius: 500,
+    blastForce: 35,
   },
   tsar: {
     id: 'tsar',
@@ -98,6 +102,8 @@ const FIREWORK_TYPES = {
     desc: '密集级联空爆，屏幕级覆盖，多波次重叠爆炸——如炮兵弹幕。白黄核心配红橙绽放。',
     accent: '#ff6b35',
     rank: 1,
+    blastRadius: 350,
+    blastForce: 20,
   },
   daxi: {
     id: 'daxi',
@@ -106,6 +112,8 @@ const FIREWORK_TYPES = {
     desc: '低空重型炮击，深沉轰鸣感，强烈白色闪光，冲击波环。大型单次爆发，厚重粒子急坠。',
     accent: '#f5f5dc',
     rank: 2,
+    blastRadius: 250,
+    blastForce: 18,
   },
   carrier: {
     id: 'carrier',
@@ -114,6 +122,8 @@ const FIREWORK_TYPES = {
     desc: '扇形齐射，多层覆盖，广域扩散——如舰队火力平台。多枚火箭同时扇形发射。',
     accent: '#00e5a0',
     rank: 3,
+    blastRadius: 200,
+    blastForce: 10,
   },
   tomahawk: {
     id: 'tomahawk',
@@ -122,6 +132,8 @@ const FIREWORK_TYPES = {
     desc: '高速上升，速射连爆，啸声尾迹——如导弹齐射。长升空尾迹后链式爆炸。',
     accent: '#ff3366',
     rank: 4,
+    blastRadius: 180,
+    blastForce: 12,
   },
   gatling: {
     id: 'gatling',
@@ -130,6 +142,8 @@ const FIREWORK_TYPES = {
     desc: '连续火力流，快速扫射喷发——如机枪扫射。极高射速，扫射弧线粒子流。',
     accent: '#ffd700',
     rank: 5,
+    blastRadius: 100,
+    blastForce: 5,
   },
   normal: {
     id: 'normal',
@@ -138,6 +152,8 @@ const FIREWORK_TYPES = {
     desc: '标准空中绽放，规则花形——经典圆形对称烟花爆炸，多彩花瓣。',
     accent: '#a78bfa',
     rank: 6,
+    blastRadius: 80,
+    blastForce: 3,
   },
 };
 
@@ -218,11 +234,21 @@ let particles = [];
 let rockets = [];
 let screenFlash = 0;
 
+// ---- Blast helper for airplanes ----
+function applyAirplaneBlast(x, y, typeId) {
+  if (!window.AirplaneSystem) return;
+  const type = FIREWORK_TYPES[typeId];
+  if (type && type.blastRadius) {
+    window.AirplaneSystem.applyBlast(x, y, type.blastRadius, type.blastForce);
+  }
+}
+
 // ---- Burst Implementations ----
 
 // 沙皇5000/9000: Dense cascading airbursts, multiple waves
 function burstTsar(x, y) {
   if (window.SoundEngine) window.SoundEngine.playTsar();
+  applyAirplaneBlast(x, y, 'tsar');
   const colors = [
     { r: 255, g: 107, b: 53 },   // orange
     { r: 255, g: 220, b: 50 },    // yellow
@@ -307,6 +333,7 @@ function burstTsar(x, y) {
 // 大西炮: Low-altitude heavy cannon blast, shockwave ring
 function burstDaxi(x, y) {
   if (window.SoundEngine) window.SoundEngine.playDaxi();
+  applyAirplaneBlast(x, y, 'daxi');
   // Shockwave ring
   for (let i = 0; i < 150; i++) {
     const angle = (i / 150) * Math.PI * 2;
@@ -370,6 +397,7 @@ function burstDaxi(x, y) {
 // 航母系列: Fan-shaped volley, multiple rockets
 function burstCarrier(startX, startY, canvasW, canvasH) {
   if (window.SoundEngine) window.SoundEngine.playCarrier();
+  applyAirplaneBlast(startX, startY, 'carrier');
   const colors = [
     { r: 0, g: 229, b: 160 },   // green
     { r: 50, g: 255, b: 200 },  // mint
@@ -428,6 +456,7 @@ function burstCarrier(startX, startY, canvasW, canvasH) {
 // 战斧系列: High-speed ascent, chain explosions
 function burstTomahawk(startX, startY, canvasW, canvasH) {
   if (window.SoundEngine) window.SoundEngine.playTomahawk();
+  applyAirplaneBlast(startX, startY, 'tomahawk');
   const colors = [
     { r: 255, g: 51, b: 102 },   // hot pink
     { r: 255, g: 100, b: 50 },   // orange-red
@@ -488,6 +517,7 @@ function burstTomahawk(startX, startY, canvasW, canvasH) {
 // 大型加特林: Continuous sweeping stream
 function burstGatling(startX, startY, canvasW, canvasH) {
   if (window.SoundEngine) window.SoundEngine.playGatling();
+  applyAirplaneBlast(startX, startY, 'gatling');
   const colors = [
     { r: 255, g: 215, b: 0 },    // gold
     { r: 255, g: 180, b: 0 },    // dark gold
@@ -548,6 +578,7 @@ function burstGatling(startX, startY, canvasW, canvasH) {
 // 普通礼花: Classic round symmetrical burst
 function burstNormal(x, y) {
   if (window.SoundEngine) window.SoundEngine.playNormal();
+  applyAirplaneBlast(x, y, 'normal');
   const palettes = [
     [{ r: 255, g: 100, b: 100 }, { r: 255, g: 150, b: 150 }], // red
     [{ r: 100, g: 200, b: 255 }, { r: 150, g: 220, b: 255 }], // blue
@@ -607,6 +638,7 @@ function burstNormal(x, y) {
 function burstAtomic(x, y) {
   screenFlash = 1.0; // 最强白闪
   if (window.SoundEngine) window.SoundEngine.playAtomic();
+  applyAirplaneBlast(x, y, 'atomic');
 
   // 阶段1: 大火球 (0~2s)
   for (let i = 0; i < 600; i++) {
@@ -760,6 +792,7 @@ function burstHydrogen(x, y) {
   screenFlash = 1.0;
   setTimeout(() => { screenFlash = 0.8; }, 200);
   if (window.SoundEngine) window.SoundEngine.playHydrogen();
+  applyAirplaneBlast(x, y, 'hydrogen');
 
   // 阶段1: 巨型火球 (0~2s)
   for (let i = 0; i < 800; i++) {
@@ -1128,8 +1161,10 @@ function animate(timestamp) {
   // Update
   updateRockets();
   updateParticles();
+  if (window.AirplaneSystem) window.AirplaneSystem.update();
 
   // Render
+  if (window.AirplaneSystem) window.AirplaneSystem.render(ctx);
   renderRockets(ctx);
   renderParticles(ctx);
   renderScreenFlash(ctx, w, h);
@@ -1143,6 +1178,9 @@ function animate(timestamp) {
 
 function startAnimation() {
   if (!animationId) {
+    if (window.AirplaneSystem && window.AirplaneSystem.getCount() === 0) {
+      window.AirplaneSystem.spawnAll();
+    }
     animationId = requestAnimationFrame(animate);
   }
 }
@@ -1158,6 +1196,7 @@ function resizeCanvas() {
   const canvas = document.getElementById('fireworks-canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  if (window.AirplaneSystem) window.AirplaneSystem.resize(canvas.width, canvas.height);
 }
 
 // Export for app.js
