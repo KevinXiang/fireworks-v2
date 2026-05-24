@@ -371,10 +371,11 @@ function burstCarrier(startX, startY, canvasW, canvasH) {
     const delay = i * 80; // staggered launch
     setTimeout(() => {
       const rocketX = baseX + (spread / count) * i + randomInRange(-20, 20);
-      const targetY = h * randomInRange(0.15, 0.35);
+      const targetY = h * randomInRange(0.2, 0.35);
       const c = randomColor(colors);
 
       const r = createRocket(rocketX, targetY, {
+        startY: h,
         vx: randomInRange(-0.5, 0.5),
         vy: -(randomInRange(10, 15)),
         color: c,
@@ -422,9 +423,10 @@ function burstTomahawk(startX, startY, canvasW, canvasH) {
     const delay = i * 120;
     setTimeout(() => {
       const rocketX = startX + randomInRange(-60, 60);
-      const targetY = h * randomInRange(0.1, 0.25);
+      const targetY = h * randomInRange(0.2, 0.35);
 
       const r = createRocket(rocketX, targetY, {
+        startY: h,
         vx: randomInRange(-0.3, 0.3),
         vy: -(randomInRange(14, 18)), // very fast
         color: { r: 255, g: 100, b: 50 },
@@ -589,12 +591,13 @@ function getVisibleWidth(canvasW) {
 function launchFirework(typeId, canvasW, canvasH) {
   const visibleW = getVisibleWidth(canvasW);
   const cx = visibleW * randomInRange(0.15, 0.85);
-  const targetY = canvasH * randomInRange(0.15, 0.4);
+  const targetY = canvasH * randomInRange(0.2, 0.35);
 
   switch (typeId) {
     case 'tsar': {
       // Tsar launches a single rocket that triggers massive multi-wave burst
       const r = createRocket(cx, targetY, {
+        startY: canvasH,
         vy: -(randomInRange(10, 13)),
         color: { r: 255, g: 200, b: 80 },
         trailMax: 18,
@@ -607,6 +610,7 @@ function launchFirework(typeId, canvasW, canvasH) {
       // Daxi: low altitude, heavy blast
       const lowY = canvasH * randomInRange(0.45, 0.6);
       const r = createRocket(cx, lowY, {
+        startY: canvasH,
         vy: -(randomInRange(7, 10)),
         color: { r: 255, g: 255, b: 220 },
         trailMax: 10,
@@ -629,6 +633,7 @@ function launchFirework(typeId, canvasW, canvasH) {
     }
     case 'normal': {
       const r = createRocket(cx, targetY, {
+        startY: canvasH,
         vy: -(randomInRange(9, 12)),
         color: { r: 200, g: 200, b: 255 },
         trailMax: 10,
