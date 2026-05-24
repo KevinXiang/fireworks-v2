@@ -222,6 +222,7 @@ let screenFlash = 0;
 
 // 沙皇5000/9000: Dense cascading airbursts, multiple waves
 function burstTsar(x, y) {
+  if (window.SoundEngine) window.SoundEngine.playTsar();
   const colors = [
     { r: 255, g: 107, b: 53 },   // orange
     { r: 255, g: 220, b: 50 },    // yellow
@@ -305,6 +306,7 @@ function burstTsar(x, y) {
 
 // 大西炮: Low-altitude heavy cannon blast, shockwave ring
 function burstDaxi(x, y) {
+  if (window.SoundEngine) window.SoundEngine.playDaxi();
   // Shockwave ring
   for (let i = 0; i < 150; i++) {
     const angle = (i / 150) * Math.PI * 2;
@@ -367,6 +369,7 @@ function burstDaxi(x, y) {
 
 // 航母系列: Fan-shaped volley, multiple rockets
 function burstCarrier(startX, startY, canvasW, canvasH) {
+  if (window.SoundEngine) window.SoundEngine.playCarrier();
   const colors = [
     { r: 0, g: 229, b: 160 },   // green
     { r: 50, g: 255, b: 200 },  // mint
@@ -424,6 +427,7 @@ function burstCarrier(startX, startY, canvasW, canvasH) {
 
 // 战斧系列: High-speed ascent, chain explosions
 function burstTomahawk(startX, startY, canvasW, canvasH) {
+  if (window.SoundEngine) window.SoundEngine.playTomahawk();
   const colors = [
     { r: 255, g: 51, b: 102 },   // hot pink
     { r: 255, g: 100, b: 50 },   // orange-red
@@ -483,6 +487,7 @@ function burstTomahawk(startX, startY, canvasW, canvasH) {
 
 // 大型加特林: Continuous sweeping stream
 function burstGatling(startX, startY, canvasW, canvasH) {
+  if (window.SoundEngine) window.SoundEngine.playGatling();
   const colors = [
     { r: 255, g: 215, b: 0 },    // gold
     { r: 255, g: 180, b: 0 },    // dark gold
@@ -542,6 +547,7 @@ function burstGatling(startX, startY, canvasW, canvasH) {
 
 // 普通礼花: Classic round symmetrical burst
 function burstNormal(x, y) {
+  if (window.SoundEngine) window.SoundEngine.playNormal();
   const palettes = [
     [{ r: 255, g: 100, b: 100 }, { r: 255, g: 150, b: 150 }], // red
     [{ r: 100, g: 200, b: 255 }, { r: 150, g: 220, b: 255 }], // blue
@@ -600,6 +606,7 @@ function burstNormal(x, y) {
 // ---- 原子弹: Mushroom cloud ----
 function burstAtomic(x, y) {
   screenFlash = 1.0; // 最强白闪
+  if (window.SoundEngine) window.SoundEngine.playAtomic();
 
   // 阶段1: 大火球 (0~2s)
   for (let i = 0; i < 600; i++) {
@@ -752,6 +759,7 @@ function burstHydrogen(x, y) {
   // 双闪
   screenFlash = 1.0;
   setTimeout(() => { screenFlash = 0.8; }, 200);
+  if (window.SoundEngine) window.SoundEngine.playHydrogen();
 
   // 阶段1: 巨型火球 (0~2s)
   for (let i = 0; i < 800; i++) {

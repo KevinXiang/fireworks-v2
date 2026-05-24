@@ -96,6 +96,7 @@
   });
 
   function detonate() {
+    if (window.SoundEngine) window.SoundEngine.init();
     isDetonating = true;
     detonateBtn.disabled = true;
     detonateBtn.classList.add('dooking');
