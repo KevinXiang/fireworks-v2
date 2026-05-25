@@ -27,7 +27,7 @@
       bobPhase: Math.random() * Math.PI * 2,
       bobAmp: randomRange(0.1, 0.4),
       bobFreq: randomRange(0.005, 0.015),
-      scale: randomRange(1.0, 2.0),
+      scale: randomRange(0.4, 3.0),
       stunned: false,
       stunTimer: 0,
       trail: [],
@@ -181,11 +181,13 @@
         p.y = canvasH * randomRange(0.1, 0.55);
         p.bobPhase = Math.random() * Math.PI * 2;
         p.color = randomPlaneColor();
+        p.scale = randomRange(0.4, 3.0);
       } else if (p.x < -margin && p.direction < 0) {
         p.x = canvasW + margin;
         p.y = canvasH * randomRange(0.1, 0.55);
         p.bobPhase = Math.random() * Math.PI * 2;
         p.color = randomPlaneColor();
+        p.scale = randomRange(0.4, 3.0);
       }
 
       // Keep in bounds vertically
