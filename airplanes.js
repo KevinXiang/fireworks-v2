@@ -340,12 +340,30 @@
     canvasH = h;
   }
 
+  // ---- Destroy all planes (for armageddon) ----
+  function destroyAll(bx, by) {
+    for (const p of planes) {
+      createDebris(p.x, p.y, p.color, p.vx || 0, p.vy || 0);
+    }
+    planes.length = 0;
+    // Gradually respawn
+    const respawnInterval = setInterval(() => {
+      if (planes.length < PLANE_COUNT) {
+        const np = createPlane();
+        np.x = Math.random() > 0.5 ? -80 : canvasW + 80;
+        planes.push(np);
+      }
+      if (planes.length >= PLANE_COUNT) clearInterval(respawnInterval);
+    }, 400);
+  }
+
   // ---- Export ----
   window.AirplaneSystem = {
     spawnAll,
     update,
     render,
     applyBlast,
+    destroyAll,
     resize,
     getCount: () => planes.length,
   };

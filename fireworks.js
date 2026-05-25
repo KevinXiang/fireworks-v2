@@ -75,6 +75,16 @@ function randomColor(colors) {
 
 // ---- Firework Type Definitions ----
 const FIREWORK_TYPES = {
+  armageddon: {
+    id: 'armageddon',
+    name: '灭世炸弹',
+    badge: 'TIER-SSS · 终极',
+    desc: '白洞湮灭——万物凝固、白光吞噬、时空撕裂、全屏毁灭。不是爆炸，是末日降临。',
+    accent: '#e0e0e0',
+    rank: -1,
+    blastRadius: 9999,
+    blastForce: 50,
+  },
   atomic: {
     id: 'atomic',
     name: '原子弹',
@@ -233,6 +243,8 @@ function drawRocket(ctx, r) {
 let particles = [];
 let rockets = [];
 let screenFlash = 0;
+let shakeIntensity = 0;
+let vignetteAlpha = 0;
 
 // ---- Blast helper for airplanes ----
 function applyAirplaneBlast(x, y, typeId) {
@@ -635,7 +647,149 @@ function burstNormal(x, y) {
   }
 }
 
-// ---- 原子弹: Mushroom cloud ----
+// ---- 灭世炸弹: White Hole Annihilation ----
+function burstArmageddon(x, y) {
+  // 阶段0: 能量聚焦 (0~1s) - 光点汇聚 + 边缘暗化
+  vignetteAlpha = 0;
+  const vignetteRamp = setInterval(() => {
+    if (vignetteAlpha < 0.85) vignetteAlpha += 0.03;
+  }, 30);
+
+  // 向内螺旋粒子 - 万物被吸向爆心
+  for (let w = 0; w < 3; w++) {
+    const delay = w * 200;
+    setTimeout(() => {
+      for (let i = 0; i < 80; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = randomInRange(100, 400);
+        const px = x + Math.cos(angle) * dist;
+        const py = y + Math.sin(angle) * dist;
+        const p = createParticle(px, py,
+          -(px - x) * 0.02, -(py - y) * 0.02,
+          {
+            life: 1,
+            decay: randomInRange(0.03, 0.06),
+            size: randomInRange(1, 3),
+            sizeEnd: 0,
+            color: { r: 255, g: 255, b: 255 },
+            colorEnd: { r: 100, g: 100, b: 255 },
+            gravity: 0,
+            drag: 0.99,
+            trail: true,
+            trailLength: 3,
+          }
+        );
+        if (p) particles.push(p);
+      }
+    }, delay);
+  }
+
+  // 阶段1: 纯白吞噬 (1s) + 灭世音效
+  setTimeout(() => {
+    if (window.SoundEngine) window.SoundEngine.playArmageddon();
+    screenFlash = 2.0; // 超强白闪，持续吸入
+    shakeIntensity = 25;
+    clearInterval(vignetteRamp);
+    vignetteAlpha = 0;
+
+    // 清空所有现有粒子和火箭
+    particles.length = 0;
+    rockets.length = 0;
+
+    // 灭掉所有飞机
+    if (window.AirplaneSystem) {
+      window.AirplaneSystem.destroyAll(x, y);
+    }
+
+    // 阶段2: 万物炸裂 (1.5~3s) - 全色域粒子爆发
+    setTimeout(() => {
+      shakeIntensity = 15;
+
+      // 1000+ 粒子爆发
+      for (let i = 0; i < 1000; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = randomInRange(1, 14);
+        const hue = Math.random() * 360;
+        const c = hslToRgb(hue, 100, randomRange(40, 80));
+        const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
+          life: 1,
+          decay: randomInRange(0.003, 0.008),
+          size: randomInRange(1.5, 5),
+          sizeEnd: 0.3,
+          color: c,
+          colorEnd: { r: Math.floor(c.r * 0.3), g: Math.floor(c.g * 0.3), b: Math.floor(c.b * 0.3) },
+          gravity: 0.03,
+          drag: 0.98,
+          trail: true,
+          trailLength: 4,
+        });
+        if (p) particles.push(p);
+      }
+
+      // 三道冲击波
+      for (let ring = 0; ring < 3; ring++) {
+        setTimeout(() => {
+          shakeIntensity = 10 - ring * 2;
+          for (let i = 0; i < 300; i++) {
+            const angle = (i / 300) * Math.PI * 2;
+            const speed = 5 + ring * 4;
+            const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
+              life: 1,
+              decay: randomInRange(0.004, 0.01),
+              size: randomInRange(2, 6),
+              sizeEnd: 0.5,
+              color: { r: 255, g: 255, b: 255 },
+              colorEnd: { r: 150, g: 100, b: 200 },
+              gravity: 0.02,
+              drag: 0.98,
+              trail: true,
+              trailLength: 5,
+            });
+            if (p) particles.push(p);
+          }
+        }, 200 + ring * 500);
+      }
+
+      // 阶段3: 余辉寂灭 (3~6s)
+      for (let w = 0; w < 5; w++) {
+        setTimeout(() => {
+          shakeIntensity = Math.max(0, shakeIntensity - 1.5);
+          for (let i = 0; i < 60; i++) {
+            const p = createParticle(
+              x + randomInRange(-80, 80),
+              y + randomInRange(-60, 60),
+              randomInRange(-0.2, 0.2),
+              randomInRange(-0.3, 0.1),
+              {
+                life: 1,
+                decay: randomInRange(0.001, 0.004),
+                size: randomInRange(2, 7),
+                sizeEnd: 0.3,
+                color: { r: 100, g: 60, b: 180 },
+                colorEnd: { r: 40, g: 10, b: 60 },
+                gravity: 0.003,
+                drag: 0.99,
+                trail: true,
+                trailLength: 8,
+                flicker: true,
+              }
+            );
+            if (p) particles.push(p);
+          }
+        }, 2500 + w * 700);
+      }
+    }, 500);
+  }, 1000);
+}
+
+// HSL to RGB utility
+function hslToRgb(h, s, l) {
+  s /= 100; l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return { r: Math.round(255 * f(0)), g: Math.round(255 * f(8)), b: Math.round(255 * f(4)) };
+}
 function burstAtomic(x, y) {
   screenFlash = 1.0; // 最强白闪
   if (window.SoundEngine) window.SoundEngine.playAtomic();
@@ -929,6 +1083,19 @@ function launchFirework(typeId, canvasW, canvasH) {
   const targetY = canvasH * randomInRange(0.2, 0.35);
 
   switch (typeId) {
+    case 'armageddon': {
+      // Armageddon: white hole annihilation, medium altitude
+      const midY = canvasH * randomInRange(0.2, 0.35);
+      const r = createRocket(cx, midY, {
+        startY: canvasH,
+        vy: -(randomInRange(5, 7)),
+        color: { r: 255, g: 255, b: 255 },
+        trailMax: 20,
+        onBurst: (bx, by) => burstArmageddon(bx, by),
+      });
+      rockets.push(r);
+      break;
+    }
     case 'atomic': {
       // Atomic: mushroom cloud, medium altitude
       const midY = canvasH * randomInRange(0.3, 0.45);
@@ -1164,11 +1331,32 @@ function animate(timestamp) {
   updateParticles();
   if (window.AirplaneSystem) window.AirplaneSystem.update();
 
+  // Screen shake
+  let shakeX = 0, shakeY = 0;
+  if (shakeIntensity > 0.1) {
+    shakeX = (Math.random() - 0.5) * shakeIntensity * 2;
+    shakeY = (Math.random() - 0.5) * shakeIntensity * 2;
+    shakeIntensity *= 0.92;
+    if (shakeIntensity < 0.1) shakeIntensity = 0;
+  }
+
   // Render
+  ctx.save();
+  ctx.translate(shakeX, shakeY);
   if (window.AirplaneSystem) window.AirplaneSystem.render(ctx);
   renderRockets(ctx);
   renderParticles(ctx);
+  ctx.restore();
   renderScreenFlash(ctx, w, h);
+
+  // Vignette overlay
+  if (vignetteAlpha > 0.01) {
+    const gradient = ctx.createRadialGradient(w / 2, h / 2, w * 0.3, w / 2, h / 2, w * 0.9);
+    gradient.addColorStop(0, `rgba(0, 0, 0, 0)`);
+    gradient.addColorStop(1, `rgba(0, 0, 0, ${vignetteAlpha})`);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, w, h);
+  }
 
   // Update particle count display
   const countEl = document.getElementById('particle-count');

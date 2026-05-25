@@ -251,6 +251,42 @@
     oscTone({ freq: 200, freqEnd: 60, duration: 0.2, type: 'sine', volume: 0.1 });
   }
 
+  function playArmageddon() {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+
+    // Fade-in sub rumble (0~1s)
+    const sub = ctx.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(18, now);
+    sub.frequency.linearRampToValueAtTime(8, now + 3.0);
+
+    const subGain = ctx.createGain();
+    subGain.gain.setValueAtTime(0, now);
+    subGain.gain.linearRampToValueAtTime(0.7, now + 1.0);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
+
+    sub.connect(subGain);
+    subGain.connect(ctx.destination);
+    sub.start(now);
+    sub.stop(now + 3.5);
+
+    // Main blast at 1s
+    delayed(() => {
+      // Massive noise blast
+      noiseBurst({ duration: 2.0, decayExp: 1.5, filterFreq: 80, volume: 0.8 });
+      // Secondary burst
+      delayed(() => noiseBurst({ duration: 1.5, decayExp: 2, filterFreq: 120, volume: 0.5 }), 400);
+      // High crackle
+      delayed(() => noiseBurst({ duration: 0.8, decayExp: 3, filterType: 'highpass', filterFreq: 600, volume: 0.3 }), 800);
+    }, 1000);
+
+    // Long after-rumble
+    delayed(() => {
+      noiseBurst({ duration: 3.0, decayExp: 1.2, filterFreq: 60, volume: 0.4 });
+    }, 2000);
+  }
+
   // ---- Export ----
   window.SoundEngine = {
     playAtomic,
@@ -261,6 +297,7 @@
     playTomahawk,
     playGatling,
     playNormal,
+    playArmageddon,
     // Resume audio context (call on first user interaction)
     init() { getCtx(); },
   };

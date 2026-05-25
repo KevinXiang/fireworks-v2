@@ -22,7 +22,7 @@
   const intervalValue = document.getElementById('interval-value');
 
   // ---- Build Cards ----
-  const typeOrder = ['atomic', 'hydrogen', 'tsar', 'daxi', 'carrier', 'tomahawk', 'gatling', 'normal'];
+  const typeOrder = ['armageddon', 'atomic', 'hydrogen', 'tsar', 'daxi', 'carrier', 'tomahawk', 'gatling', 'normal'];
 
   typeOrder.forEach((key) => {
     const type = TYPES[key];
@@ -172,9 +172,9 @@
       e.preventDefault();
       detonate();
     }
-    // Number keys 1-8 to toggle selection
+    // Number keys 1-9 to toggle selection
     const numKey = parseInt(e.key);
-    if (numKey >= 1 && numKey <= 8 && !isDetonating) {
+    if (numKey >= 1 && numKey <= 9 && !isDetonating) {
       const typeId = typeOrder[numKey - 1];
       toggleSelection(typeId);
     }
