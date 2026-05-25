@@ -88,4 +88,4 @@ No `DOMContentLoaded` or `window.onload` — `app.js` is the last `<script>` in 
 - **No external JS libraries** — Canvas API and vanilla DOM only.
 - **No tests** — manual browser verification.
 - **One commit per feature** — each functional change should be a separate, focused git commit.
-- Google Fonts CDN used for typography (requires network on first load).
+- Orbitron font loaded locally from `fonts/`.

@@ -2,6 +2,15 @@
    FIREWORKS COMMAND CENTER — Design System
    ============================================ */
 
+/* Local fonts */
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('fonts/Orbitron.woff2') format('woff2');
+}
+
 :root {
   /* --- Color Tokens --- */
   --c-bg-deep: #06080f;
@@ -41,7 +50,7 @@
 
   /* --- Typography --- */
   --font-display: 'Orbitron', monospace;
-  --font-body: 'Noto Sans SC', sans-serif;
+  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
 
   --fs-xs: 0.625rem;    /* 10px */
   --fs-sm: 0.75rem;     /* 12px */
