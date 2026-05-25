@@ -702,7 +702,7 @@ function burstArmageddon(x, y) {
 
     // 清空已有粒子和火箭
     setTimeout(() => {
-      particles.length = 0;
+      clearAllParticles();
       rockets.length = 0;
       if (window.AirplaneSystem) window.AirplaneSystem.destroyAll(x, y);
     }, 250);
@@ -1172,6 +1172,7 @@ function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     if (!p.alive) {
+      releaseParticle(p);
       particles.splice(i, 1);
       continue;
     }
@@ -1240,6 +1241,15 @@ function updateRockets() {
   }
 }
 
+// ---- Clear utilities ----
+function clearAllParticles() {
+  for (const p of particles) {
+    p.alive = false;
+    releaseParticle(p);
+  }
+  particles.length = 0;
+}
+
 function renderParticles(ctx) {
   for (const p of particles) {
     if (!p.alive) continue;
@@ -1249,12 +1259,16 @@ function renderParticles(ctx) {
     const currentSize = p.sizeEnd !== undefined ? p.size + (p.sizeEnd - p.size) * t : p.size;
     const currentAlpha = Math.max(0, Math.min(1, p.alpha));
 
-    // Draw trail
-    if (p.trail && p.trailHistory.length > 1) {
+    // Skip nearly invisible particles
+    if (currentAlpha < 0.02 || currentSize < 0.2) continue;
+
+    // Draw trail (skip for tiny particles to save draw calls)
+    if (p.trail && p.trailHistory.length > 1 && currentSize > 1) {
       for (let j = 0; j < p.trailHistory.length; j++) {
         const th = p.trailHistory[j];
         const trailAlpha = (j / p.trailHistory.length) * currentAlpha * 0.5;
         const trailSize = currentSize * (j / p.trailHistory.length) * 0.7;
+        if (trailAlpha < 0.01) continue;
         ctx.beginPath();
         ctx.arc(th.x, th.y, Math.max(0.5, trailSize), 0, Math.PI * 2);
         ctx.fillStyle = rgba(currentColor, trailAlpha);
@@ -1269,7 +1283,7 @@ function renderParticles(ctx) {
     ctx.fill();
 
     // Glow for larger particles
-    if (currentSize > 2) {
+    if (currentSize > 2 && currentAlpha > 0.05) {
       ctx.beginPath();
       ctx.arc(p.x, p.y, currentSize * 2, 0, Math.PI * 2);
       ctx.fillStyle = rgba(currentColor, currentAlpha * 0.15);
