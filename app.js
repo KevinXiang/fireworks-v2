@@ -98,6 +98,7 @@
   });
 
   function detonate() {
+    selectionPanel.classList.add('collapsed');
     if (window.SoundEngine) window.SoundEngine.init();
     isDetonating = true;
     detonateBtn.disabled = true;
