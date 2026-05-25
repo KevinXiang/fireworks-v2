@@ -310,21 +310,6 @@ html, body {
   opacity: 0.6;
 }
 
-.firework-card__icon {
-  font-family: 'Material Symbols Outlined';
-  font-size: var(--fs-xl);
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  color: var(--card-accent);
-  opacity: 0.7;
-  transition: font-variation-settings 0.3s ease, opacity 0.3s ease;
-  flex-shrink: 0;
-  user-select: none;
-}
-.firework-card.selected .firework-card__icon {
-  font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
-  opacity: 1;
-}
-
 .firework-card__info {
   flex: 1;
   min-width: 0;
