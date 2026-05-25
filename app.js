@@ -35,6 +35,7 @@
     card.innerHTML = `
       <div class="firework-card__top">
         <span class="firework-card__rank">${type.rank}</span>
+        <span class="firework-card__icon material-symbols-outlined" aria-hidden="true" data-icon="${type.icon}">${type.icon}</span>
         <div class="firework-card__info">
           <div class="firework-card__name">${type.name}</div>
           <span class="firework-card__badge">${type.badge}</span>
