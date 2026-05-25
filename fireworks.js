@@ -189,9 +189,10 @@ function updateRocket(r) {
   r.trail.push({ x: r.x, y: r.y });
   if (r.trail.length > r.trailMax) r.trail.shift();
 
-  r.x += r.vx;
-  r.y += r.vy;
-  r.vy += 0.04; // slight gravity on rocket
+  const ts = timeScale;
+  r.x += r.vx * ts;
+  r.y += r.vy * ts;
+  r.vy += 0.04 * ts; // slight gravity on rocket
 
   // Emit trail sparks
   r.sparkTimer++;
@@ -245,6 +246,7 @@ let rockets = [];
 let screenFlash = 0;
 let shakeIntensity = 0;
 let vignetteAlpha = 0;
+let timeScale = 1.0;  // 1=normal, 0=frozen
 
 // ---- Blast helper for airplanes ----
 function applyAirplaneBlast(x, y, typeId) {
@@ -649,136 +651,128 @@ function burstNormal(x, y) {
 
 // ---- 灭世炸弹: White Hole Annihilation ----
 function burstArmageddon(x, y) {
-  // 阶段0: 能量聚焦 (0~1s) - 光点汇聚 + 边缘暗化
+  // ═══ 阶段0: 能量聚焦 (0~1s) ═══
+  // 时间凝固 - 全屏慢速
+  timeScale = 0.08;
+
+  // 边缘暗化
   vignetteAlpha = 0;
   const vignetteRamp = setInterval(() => {
-    if (vignetteAlpha < 0.85) vignetteAlpha += 0.03;
+    if (vignetteAlpha < 0.9) vignetteAlpha += 0.035;
   }, 30);
 
-  // 向内螺旋粒子 - 万物被吸向爆心
-  for (let w = 0; w < 3; w++) {
-    const delay = w * 200;
+  // 光点向心旋聚粒子
+  for (let w = 0; w < 4; w++) {
     setTimeout(() => {
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 60; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const dist = randomInRange(100, 400);
+        const dist = randomInRange(80, 400);
         const px = x + Math.cos(angle) * dist;
         const py = y + Math.sin(angle) * dist;
         const p = createParticle(px, py,
-          -(px - x) * 0.02, -(py - y) * 0.02,
+          -(px - x) * 0.015, -(py - y) * 0.015,
           {
-            life: 1,
-            decay: randomInRange(0.03, 0.06),
-            size: randomInRange(1, 3),
-            sizeEnd: 0,
+            life: 1, decay: randomInRange(0.02, 0.05),
+            size: randomInRange(1, 3), sizeEnd: 0,
             color: { r: 255, g: 255, b: 255 },
             colorEnd: { r: 100, g: 100, b: 255 },
-            gravity: 0,
-            drag: 0.99,
-            trail: true,
-            trailLength: 3,
+            gravity: 0, drag: 0.99,
+            trail: true, trailLength: 3,
           }
         );
         if (p) particles.push(p);
       }
-    }, delay);
+    }, w * 220);
   }
 
-  // 阶段1: 纯白吞噬 (1s) + 灭世音效
+  // ═══ 阶段1: 纯白吞噬 (1~1.5s) ═══
   setTimeout(() => {
     if (window.SoundEngine) window.SoundEngine.playArmageddon();
-    screenFlash = 2.0; // 超强白闪，持续吸入
-    shakeIntensity = 25;
     clearInterval(vignetteRamp);
     vignetteAlpha = 0;
+    timeScale = 1.0; // 恢复时间
 
-    // 清空所有现有粒子和火箭
-    particles.length = 0;
-    rockets.length = 0;
+    // 0.5秒白闪渐进 → 万物消失
+    let flashVal = 0.3;
+    const flashRamp = setInterval(() => {
+      flashVal += 0.12;
+      screenFlash = Math.min(flashVal, 2.5);
+      if (flashVal >= 2.5) clearInterval(flashRamp);
+    }, 16);
 
-    // 灭掉所有飞机
-    if (window.AirplaneSystem) {
-      window.AirplaneSystem.destroyAll(x, y);
-    }
-
-    // 阶段2: 万物炸裂 (1.5~3s) - 全色域粒子爆发
+    // 清空已有粒子和火箭
     setTimeout(() => {
-      shakeIntensity = 15;
+      particles.length = 0;
+      rockets.length = 0;
+      if (window.AirplaneSystem) window.AirplaneSystem.destroyAll(x, y);
+    }, 250);
 
-      // 1000+ 粒子爆发
-      for (let i = 0; i < 1000; i++) {
+    // ═══ 阶段2: 万物炸裂 (1.5~3s) ═══
+    // ═══ 阶段4: 屏幕震动 (1.5~4s) ═══
+    setTimeout(() => {
+      shakeIntensity = 28; // 震动与粒子同时开始
+
+      // 1000+ 全色域粒子向外喷发
+      for (let i = 0; i < 1200; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = randomInRange(1, 14);
+        const speed = randomInRange(2, 15);
         const hue = Math.random() * 360;
         const c = hslToRgb(hue, 100, randomRange(40, 80));
         const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
-          life: 1,
-          decay: randomInRange(0.003, 0.008),
-          size: randomInRange(1.5, 5),
-          sizeEnd: 0.3,
+          life: 1, decay: randomInRange(0.003, 0.007),
+          size: randomInRange(1.5, 5), sizeEnd: 0.2,
           color: c,
           colorEnd: { r: Math.floor(c.r * 0.3), g: Math.floor(c.g * 0.3), b: Math.floor(c.b * 0.3) },
-          gravity: 0.03,
-          drag: 0.98,
-          trail: true,
-          trailLength: 4,
+          gravity: 0.03, drag: 0.98,
+          trail: true, trailLength: 4,
         });
         if (p) particles.push(p);
       }
 
-      // 三道冲击波
+      // 三道冲击波，每道刷新震动强度
       for (let ring = 0; ring < 3; ring++) {
         setTimeout(() => {
-          shakeIntensity = 10 - ring * 2;
+          shakeIntensity = Math.max(shakeIntensity, 22 - ring * 6);
           for (let i = 0; i < 300; i++) {
             const angle = (i / 300) * Math.PI * 2;
             const speed = 5 + ring * 4;
             const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
-              life: 1,
-              decay: randomInRange(0.004, 0.01),
-              size: randomInRange(2, 6),
-              sizeEnd: 0.5,
+              life: 1, decay: randomInRange(0.004, 0.01),
+              size: randomInRange(2, 6), sizeEnd: 0.4,
               color: { r: 255, g: 255, b: 255 },
               colorEnd: { r: 150, g: 100, b: 200 },
-              gravity: 0.02,
-              drag: 0.98,
-              trail: true,
-              trailLength: 5,
+              gravity: 0.02, drag: 0.98,
+              trail: true, trailLength: 5,
             });
             if (p) particles.push(p);
           }
-        }, 200 + ring * 500);
+        }, 300 + ring * 600);
       }
+    }, 500); // 1.5s = 1000 + 500
 
-      // 阶段3: 余辉寂灭 (3~6s)
-      for (let w = 0; w < 5; w++) {
+    // ═══ 阶段5: 余辉寂灭 (3~6s) ═══
+    setTimeout(() => {
+      for (let w = 0; w < 4; w++) {
         setTimeout(() => {
-          shakeIntensity = Math.max(0, shakeIntensity - 1.5);
           for (let i = 0; i < 60; i++) {
             const p = createParticle(
-              x + randomInRange(-80, 80),
-              y + randomInRange(-60, 60),
-              randomInRange(-0.2, 0.2),
-              randomInRange(-0.3, 0.1),
+              x + randomInRange(-80, 80), y + randomInRange(-60, 60),
+              randomInRange(-0.2, 0.2), randomInRange(-0.3, 0.1),
               {
-                life: 1,
-                decay: randomInRange(0.001, 0.004),
-                size: randomInRange(2, 7),
-                sizeEnd: 0.3,
-                color: { r: 100, g: 60, b: 180 },
-                colorEnd: { r: 40, g: 10, b: 60 },
-                gravity: 0.003,
-                drag: 0.99,
-                trail: true,
-                trailLength: 8,
-                flicker: true,
+                life: 1, decay: randomInRange(0.001, 0.004),
+                size: randomInRange(2, 8), sizeEnd: 0.3,
+                color: { r: 100, g: 40, b: 180 },
+                colorEnd: { r: 30, g: 5, b: 50 },
+                gravity: 0.003, drag: 0.99,
+                trail: true, trailLength: 8, flicker: true,
               }
             );
             if (p) particles.push(p);
           }
-        }, 2500 + w * 700);
+        }, w * 800);
       }
-    }, 500);
+    }, 2000); // 3s = 1000 + 2000
+
   }, 1000);
 }
 
@@ -1188,16 +1182,17 @@ function updateParticles() {
       if (p.trailHistory.length > p.trailLength) p.trailHistory.shift();
     }
 
-    // Physics
-    p.vx += p.ax;
-    p.vy += p.gravity;
+    // Physics (with timeScale for armageddon freeze)
+    const ts = timeScale;
+    p.vx += p.ax * ts;
+    p.vy += p.gravity * ts;
     p.vx *= p.drag;
     p.vy *= p.drag;
-    p.x += p.vx;
-    p.y += p.vy;
+    p.x += p.vx * ts;
+    p.y += p.vy * ts;
 
     // Life
-    p.life -= p.decay;
+    p.life -= p.decay * ts;
     if (p.life <= 0) {
       p.alive = false;
       releaseParticle(p);
@@ -1327,6 +1322,7 @@ function animate(timestamp) {
   ctx.fillRect(0, 0, w, h);
 
   // Update
+  window._timeScale = timeScale;
   updateRockets();
   updateParticles();
   if (window.AirplaneSystem) window.AirplaneSystem.update();
@@ -1334,9 +1330,9 @@ function animate(timestamp) {
   // Screen shake
   let shakeX = 0, shakeY = 0;
   if (shakeIntensity > 0.1) {
-    shakeX = (Math.random() - 0.5) * shakeIntensity * 2;
-    shakeY = (Math.random() - 0.5) * shakeIntensity * 2;
-    shakeIntensity *= 0.92;
+    shakeX = (Math.random() - 0.5) * shakeIntensity * 3;
+    shakeY = (Math.random() - 0.5) * shakeIntensity * 3;
+    shakeIntensity -= 0.15;
     if (shakeIntensity < 0.1) shakeIntensity = 0;
   }
 

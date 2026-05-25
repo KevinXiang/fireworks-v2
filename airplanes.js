@@ -171,8 +171,9 @@
         p.vx = p.cruiseSpeed * p.direction;
       }
 
-      p.x += p.vx;
-      p.y += p.vy;
+      const ts = window._timeScale || 1;
+      p.x += p.vx * ts;
+      p.y += p.vy * ts;
 
       // Edge wrap: respawn on opposite side
       const margin = 100;
