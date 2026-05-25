@@ -565,7 +565,7 @@ html, body {
   color: var(--c-text-primary);
   font-size: var(--fs-lg);
   cursor: pointer;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   transition: all var(--duration-base) var(--ease-out);
@@ -607,10 +607,6 @@ html, body {
 
   .card-grid {
     padding: var(--sp-3);
-  }
-
-  .panel-toggle {
-    display: flex;
   }
 
   .hud-bar__title {

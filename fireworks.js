@@ -1066,7 +1066,9 @@ function burstHydrogen(x, y) {
 
 // ---- Visible area helper (exclude right-side panel on desktop) ----
 function getVisibleWidth(canvasW) {
-  const panelWidth = window.innerWidth > 768 ? 380 : 0;
+  const panel = document.getElementById('selection-panel');
+  const isCollapsed = panel && panel.classList.contains('collapsed');
+  const panelWidth = (isCollapsed || window.innerWidth <= 768) ? 0 : 380;
   return Math.max(canvasW - panelWidth, canvasW * 0.6);
 }
 
