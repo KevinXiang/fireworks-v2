@@ -1171,11 +1171,16 @@ function launchFirework(typeId, canvasW, canvasH) {
 
 // ---- Update & Render ----
 function updateParticles() {
-  for (let i = particles.length - 1; i >= 0; i--) {
+  const ts = timeScale;
+  let writeIdx = 0;
+  const sparks = [];
+
+  for (let i = 0; i < particles.length; i++) {
     const p = particles[i];
+
+    // Clean up dead particles
     if (!p.alive) {
       releaseParticle(p);
-      particles.splice(i, 1);
       continue;
     }
 
@@ -1185,8 +1190,7 @@ function updateParticles() {
       if (p.trailHistory.length > p.trailLength) p.trailHistory.shift();
     }
 
-    // Physics (with timeScale for armageddon freeze)
-    const ts = timeScale;
+    // Physics
     p.vx += p.ax * ts;
     p.vy += p.gravity * ts;
     p.vx *= p.drag;
@@ -1199,7 +1203,6 @@ function updateParticles() {
     if (p.life <= 0) {
       p.alive = false;
       releaseParticle(p);
-      particles.splice(i, 1);
       continue;
     }
 
@@ -1216,31 +1219,39 @@ function updateParticles() {
       p.size = p.size * (1 - p.decay * 2);
     }
 
-    // Spark emission
+    // Spark emission - defer to avoid compaction truncation
     if (p.spark && Math.random() < p.sparkChance) {
       const sp = createParticle(p.x, p.y, randomInRange(-0.5, 0.5), randomInRange(-0.5, 0.5), {
-        life: 0.5,
-        decay: 0.05,
-        size: 1,
-        sizeEnd: 0,
-        color: p.color,
-        gravity: 0.05,
-        drag: 0.95,
+        life: 0.5, decay: 0.05, size: 1, sizeEnd: 0,
+        color: p.color, gravity: 0.05, drag: 0.95,
       });
-      if (sp) particles.push(sp);
+      if (sp) sparks.push(sp);
     }
+
+    // Keep alive particle
+    particles[writeIdx] = p;
+    writeIdx++;
   }
+
+  // Append deferred sparks
+  for (const sp of sparks) {
+    particles[writeIdx] = sp;
+    writeIdx++;
+  }
+
+  particles.length = writeIdx;
 }
 
 function updateRockets() {
-  for (let i = rockets.length - 1; i >= 0; i--) {
+  let writeIdx = 0;
+  for (let i = 0; i < rockets.length; i++) {
     const r = rockets[i];
-    if (!r.alive) {
-      rockets.splice(i, 1);
-      continue;
-    }
+    if (!r.alive) continue;
     updateRocket(r);
+    rockets[writeIdx] = r;
+    writeIdx++;
   }
+  rockets.length = writeIdx;
 }
 
 // ---- Clear utilities ----
