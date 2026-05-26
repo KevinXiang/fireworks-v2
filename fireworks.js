@@ -62,7 +62,7 @@ function lerpColor(c1, c2, t) {
 }
 
 function rgba(c, a) {
-  return `rgba(${c.r},${c.g},${c.b},${a})`;
+  return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')';
 }
 
 function randomInRange(min, max) {
@@ -717,7 +717,7 @@ function burstArmageddon(x, y) {
         const angle = Math.random() * Math.PI * 2;
         const speed = randomInRange(2, 15);
         const hue = Math.random() * 360;
-        const c = hslToRgb(hue, 100, randomRange(40, 80));
+        const c = hslToRgb(hue, 100, randomInRange(40, 80));
         const p = createParticle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, {
           life: 1, decay: randomInRange(0.003, 0.007),
           size: randomInRange(1.5, 5), sizeEnd: 0.2,
@@ -1264,6 +1264,11 @@ function clearAllParticles() {
 }
 
 function renderParticles(ctx) {
+  const count = particles.length;
+  // Dynamic quality: drop expensive effects at high particle counts
+  const skipGlow = count > 4000;
+  const skipTrails = count > 7000;
+
   for (const p of particles) {
     if (!p.alive) continue;
 
@@ -1272,11 +1277,10 @@ function renderParticles(ctx) {
     const currentSize = p.sizeEnd !== undefined ? p.size + (p.sizeEnd - p.size) * t : p.size;
     const currentAlpha = Math.max(0, Math.min(1, p.alpha));
 
-    // Skip nearly invisible particles
     if (currentAlpha < 0.02 || currentSize < 0.2) continue;
 
-    // Draw trail (skip for tiny particles to save draw calls)
-    if (p.trail && p.trailHistory.length > 1 && currentSize > 1) {
+    // Trail — skip entirely at high particle counts
+    if (!skipTrails && p.trail && p.trailHistory.length > 1 && currentSize > 1) {
       for (let j = 0; j < p.trailHistory.length; j++) {
         const th = p.trailHistory[j];
         const trailAlpha = (j / p.trailHistory.length) * currentAlpha * 0.5;
@@ -1289,14 +1293,14 @@ function renderParticles(ctx) {
       }
     }
 
-    // Draw particle
+    // Main particle
     ctx.beginPath();
     ctx.arc(p.x, p.y, Math.max(0.5, currentSize), 0, Math.PI * 2);
     ctx.fillStyle = rgba(currentColor, currentAlpha);
     ctx.fill();
 
-    // Glow for larger particles
-    if (currentSize > 2 && currentAlpha > 0.05) {
+    // Glow — skip at medium+ particle counts
+    if (!skipGlow && currentSize > 2 && currentAlpha > 0.05) {
       ctx.beginPath();
       ctx.arc(p.x, p.y, currentSize * 2, 0, Math.PI * 2);
       ctx.fillStyle = rgba(currentColor, currentAlpha * 0.15);
