@@ -20,6 +20,7 @@
   const selectionPanel = document.getElementById('selection-panel');
   const intervalSlider = document.getElementById('interval-slider');
   const intervalValue = document.getElementById('interval-value');
+  const pauseBtn = document.getElementById('pause-btn');
 
   // ---- Build Cards ----
   const typeOrder = ['armageddon', 'atomic', 'hydrogen', 'tsar', 'daxi', 'carrier', 'tomahawk', 'gatling', 'normal'];
@@ -146,6 +147,14 @@
     intervalValue.textContent = (val / 1000).toFixed(1) + 's';
   });
 
+  // ---- Pause button ----
+  pauseBtn.addEventListener('click', () => {
+    const paused = engine.togglePause();
+    pauseBtn.classList.toggle('paused', paused);
+    pauseBtn.querySelector('.hud-bar__pause-icon').textContent = paused ? '▶' : '⏸';
+    pauseBtn.setAttribute('aria-label', paused ? '继续' : '暂停');
+  });
+
   // ---- Canvas Resize ----
   function handleResize() {
     engine.resizeCanvas();
@@ -178,6 +187,14 @@
     if (numKey >= 1 && numKey <= 9 && !isDetonating) {
       const typeId = typeOrder[numKey - 1];
       toggleSelection(typeId);
+    }
+    // P key to toggle pause
+    if (e.code === 'KeyP' && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      const paused = engine.togglePause();
+      pauseBtn.classList.toggle('paused', paused);
+      pauseBtn.querySelector('.hud-bar__pause-icon').textContent = paused ? '▶' : '⏸';
+      pauseBtn.setAttribute('aria-label', paused ? '继续' : '暂停');
     }
   });
 

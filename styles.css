@@ -193,6 +193,33 @@ html, body {
   text-align: right;
 }
 
+.hud-bar__pause-btn {
+  background: none;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  color: var(--c-text-secondary);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: var(--fs-sm);
+  line-height: 1;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.hud-bar__pause-btn:hover {
+  border-color: var(--c-border-selected);
+  color: var(--c-text-primary);
+}
+
+.hud-bar__pause-btn.paused {
+  border-color: var(--c-text-accent);
+  color: var(--c-text-accent);
+  box-shadow: 0 0 6px rgba(58, 134, 255, 0.3);
+}
+
+.hud-bar__pause-icon {
+  display: block;
+}
+
 .hud-bar__divider {
   color: var(--c-text-muted);
   margin: 0 var(--sp-1);

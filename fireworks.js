@@ -247,6 +247,7 @@ let screenFlash = 0;
 let shakeIntensity = 0;
 let vignetteAlpha = 0;
 let timeScale = 1.0;  // 1=normal, 0=frozen
+let paused = false;
 
 // ---- Blast helper for airplanes ----
 function applyAirplaneBlast(x, y, typeId) {
@@ -1352,11 +1353,13 @@ function animate(timestamp) {
   ctx.fillStyle = 'rgba(6, 8, 15, 0.15)';
   ctx.fillRect(0, 0, w, h);
 
-  // Update
-  window._timeScale = timeScale;
-  updateRockets();
-  updateParticles();
-  if (window.AirplaneSystem) window.AirplaneSystem.update();
+  // Update (skip when paused)
+  if (!paused) {
+    window._timeScale = timeScale;
+    updateRockets();
+    updateParticles();
+    if (window.AirplaneSystem) window.AirplaneSystem.update();
+  }
 
   // Screen shake
   let shakeX = 0, shakeY = 0;
@@ -1423,4 +1426,6 @@ window.FireworksEngine = {
   stopAnimation,
   resizeCanvas,
   getParticleCount: () => particles.length,
+  togglePause: () => { paused = !paused; return paused; },
+  isPaused: () => paused,
 };
